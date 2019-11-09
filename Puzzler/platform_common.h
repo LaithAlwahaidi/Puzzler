@@ -29,5 +29,6 @@ struct Input
 {
     Button_State buttons[BUTTON_COUNT];
     Screen_State screen;
+    bool mouse_drag = false;
     bool is_higlighted[9][9];
 };

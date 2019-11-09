@@ -11,6 +11,7 @@ class SudokuApp
 {
 private:
     Draw& draw;
+    void drawSudoku(Input* input);
 
 public:
     SudokuApp(Draw& draw);
