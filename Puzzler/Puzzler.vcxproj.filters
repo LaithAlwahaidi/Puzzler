@@ -49,9 +49,15 @@
     <Image Include="assets\font_0.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\font1_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\font.fnt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="assets\font1.fnt">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -86,17 +86,25 @@ LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         resize(rect);
     }
     break;
-    case WM_SIZING:
-    {
-        RECT rect = *(RECT*)lParam;
-        resize(rect);
-        // redraw when resizing
-        sAPP.simulate(&input);
-        StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.memory, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
-    }
+    //case WM_SIZING:
+    //{
+    //    RECT rect = *(RECT*)lParam;
+    //    resize(rect);
+    //    // redraw when resizing
+    //    sAPP.simulate(&input);
+    //    StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.memory, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
+    //}
+    //break;
     case WM_SETCURSOR:
     {
+        WORD l = LOWORD(lParam);
+        if (l == 0x001)
+        {
+            break;
+        }
+        result = DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
+    break;
     default:
     {
         result = DefWindowProcW(hwnd, uMsg, wParam, lParam);
@@ -115,6 +123,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     hCursorArrow = LoadCursor(NULL, IDC_ARROW);
     hCursorHand = LoadCursor(NULL, IDC_HAND);
+
     window_class.hCursor = hCursorArrow;
 
     // Register Class
