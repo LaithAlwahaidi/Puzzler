@@ -124,12 +124,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Container.cpp" />
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="win32_platform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Container.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="platform_common.h" />
     <ClInclude Include="Utilities.h" />

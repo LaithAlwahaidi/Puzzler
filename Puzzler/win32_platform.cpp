@@ -16,12 +16,27 @@
     }                                       \
     break;
 
+#define proccess_button_digit(vk)\
+    case vk:\
+    {\
+    for (int r = 0; r < 9; r++)\
+    {\
+        for (int c = 0; c < 9; c++)\
+        {\
+            if (input.is_higlighted[r][c])\
+                input.digit[r][c] = vk & 0x0F;\
+            }\
+        }\
+    }\
+    break;\
+
+
 //static bool running = true;
 
 static Render_State render_state;
 HDC hdc;
 Draw renderer(&render_state);
-SudokuApp sAPP(renderer);
+SudokuApp sAPP(renderer, &render_state);
 
 Input input = {};
 
@@ -57,7 +72,7 @@ void resize(RECT rect)
 
 object_types* get_object_at_pos(int x, int y)
 {
-    return (object_types*)(render_state.data) + x + y * render_state.width;
+    return (object_types*)(render_state.data) + x + (render_state.height - y - 1) * render_state.width;
 }
 
 
@@ -164,6 +179,17 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                 process_button(BUTTON_DOWN, VK_DOWN);
                 process_button(BUTTON_LEFT, VK_LEFT);
                 process_button(BUTTON_RIGHT, VK_RIGHT);
+
+                proccess_button_digit(0x30);
+                proccess_button_digit(0x31);
+                proccess_button_digit(0x32);
+                proccess_button_digit(0x33);
+                proccess_button_digit(0x34);
+                proccess_button_digit(0x35);
+                proccess_button_digit(0x36);
+                proccess_button_digit(0x37);
+                proccess_button_digit(0x38);
+                proccess_button_digit(0x39);
             }
         }
         break;

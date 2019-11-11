@@ -1,49 +1,35 @@
 #include "Draw.h"
-#include "win32_platform.h"
 #include <fstream>
-#include <iostream>
 #include <string>
-#include <wincodec.h>
-#include <windows.h>
-#pragma comment(lib, "WindowsCodecs.lib")
-// #include <atlbase.h>
-#include <Objbase.h>
-#include <gdiplus.h>
-#pragma comment(lib, "Gdiplus.lib")
+
+const char* FONT_HEADER = "assets/font1.fnt";
+const wchar_t* FONT_DATA = L"assets/font1_0.png";
 
 using namespace std;
 
 Draw::Draw(Render_State* rs)
     : r_s(rs)
 {
-}
-
-void Draw::draw_digit()
-{
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-    //Gdiplus::Bitmap b(L"assets/font_0.png");
-    Gdiplus::Bitmap* b = Gdiplus::Bitmap::FromFile(L"assets/font1_0.png");
-    //u32 i1 = b->GetFrameDimensionsCount();
-    //u32 i2 = b->GetHeight();
-    //u32 i3 = b->GetWidth();
-    //Gdiplus::PixelFormat pf = b->GetPixelFormat();
-
-
+    Gdiplus::Bitmap* b = Gdiplus::Bitmap::FromFile(FONT_DATA);
 
     int char_count;
     ifstream digit_info;
-    digit_info.open("assets/font1.fnt", ios::in);
+    digit_info.open(FONT_HEADER, ios::in);
     if (digit_info.is_open())
     {
         string line;
+        int font_size = 32;
         int line_n = 0;
         while (getline(digit_info, line))
         {
-            // int delim_e = line.find("=");
-            // int delim_s = line.find(" ");
-
+            if (line_n == 0)
+            {
+                int i = line.find("size=", 0) + 5;
+                int font_size = stoi(line.substr(i, line.find(" ", i)));
+            }
             if (line_n == 3)
             {
                 char_count = stoi(line.substr(12, (line.length() - 12)));
@@ -67,31 +53,34 @@ void Draw::draw_digit()
                 int yoffset = stoi(line.substr(i, line.find(" ", i)));
                 i = line.find("xadvance=", i) + 9;
                 int xadvance = stoi(line.substr(i, line.find(" ", i)));
-                if (id == 120)
-                {
-                    u32* dest;
-                    dest = new u32[width * height];
-                    int ind = 0;
-                    for (int r = height + y - 1; r >= y; r--)
-                    {
-                        for (int c = x; c < width + x; c++)
-                        {
-                            Gdiplus::Color col;
 
-                            b->GetPixel(c, r, &col);
-                            u32 dest_col =
-                                col.GetR() << 16 |
-                                col.GetG() << 8 |
-                                col.GetB();
-                            dest[ind] = dest_col;
-                            ind++;
-                        }
+                mychar cur_c;
+                cur_c.char_id = id;
+                cur_c.width = width;
+                cur_c.height = height;
+                cur_c.font_size = font_size;
+
+                u32* cur_pixels;
+                cur_pixels = new u32[width * height];
+                int ind = 0;
+                for (int r = height + y - 1; r >= y; r--)
+                {
+                    for (int c = x; c < width + x; c++)
+                    {
+                        Gdiplus::Color col;
+
+                        b->GetPixel(c, r, &col);
+                        u32 dest_col =
+                            col.GetR() << 16 |
+                            col.GetG() << 8 |
+                            col.GetB();
+                        cur_pixels[ind] = dest_col;
+                        ind++;
                     }
-                    draw_sprite_pixels(300, 100, width, height, dest);
-                    draw_sprite(0, 0, .01, .02, width, height, dest);
-                    delete[] dest;
-                    int k = 0;
                 }
+
+                cur_c.pixels = cur_pixels;
+                my_chars.push_back(cur_c);
 
             }
             line_n++;
@@ -102,6 +91,8 @@ void Draw::draw_digit()
 
     digit_info.close();
 }
+
+
 
 void Draw::draw_background(u32 color)
 {
@@ -115,10 +106,43 @@ void Draw::draw_background(u32 color)
     }
 }
 
+void Draw::draw_digit(char c, int x, int y)
+{
+    for (auto const& cur_c : my_chars)
+    {
+        if (cur_c.char_id == int(c))
+        {
+            draw_sprite_pixels(x, y, cur_c.width, cur_c.height, cur_c.pixels);
+        }
+    }
+}
+
+void Draw::draw_digit(char c, float x, float y, int scale_width, int scale_height)
+{
+    x *= scale_width;
+    y *= scale_height;
+
+    x += r_s->width / 2.f;
+    y += r_s->height / 2.f;
+
+    for (auto const& cur_c : my_chars)
+    {
+        if (cur_c.char_id == int(c))
+        {
+            int x0 = x - cur_c.width / 2;
+            int y0 = y - cur_c.height / 2;
+            draw_sprite_pixels(x0, y0, cur_c.width, cur_c.height, cur_c.pixels);
+        }
+    }
+}
+
+
 void Draw::draw_sprite_pixels(int x, int y, int width, int height, u32* source)
 {
     //x = Utils::clamp(0, x, r_s->width);
     //y = Utils::clamp(0, y, r_s->height);
+    if (r_s->width <= 0 || r_s->height <= 0)
+        return;
 
     u32 s_color;
     for (int y_d = 0; y_d < height; y_d++)
@@ -175,7 +199,10 @@ void Draw::draw_rect_pixels(square points, u32 color)
     points.y0 = Utils::clamp(0, points.y0, r_s->height);
     points.y1 = Utils::clamp(0, points.y1, r_s->height);
 
-    for (int y = points.y0; y < points.y1; y++)
+    points.y0 = r_s->height - points.y0;
+    points.y1 = r_s->height - points.y1;
+
+    for (int y = points.y1; y < points.y0; y++)
     {
         u32* pixel = (u32*)r_s->memory + points.x0 + y * r_s->width;
         for (int x = points.x0; x < points.x1; x++)
@@ -278,27 +305,37 @@ void Draw::draw_box(float x, float y, int width, int height, int total_width, in
 
 void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, bool highlight)
 {
+    draw_box(points, thickness, color);
     points.x0 += thickness;
     points.y0 += thickness;
     points.x1 -= thickness;
     points.y1 -= thickness;
-
     if (highlight)
         draw_rect_pixels(points, 0xfffa61);
-
+    points.x0 = Utils::clamp(0, points.x0, r_s->width);
+    points.x1 = Utils::clamp(0, points.x1, r_s->width);
+    points.y0 = Utils::clamp(0, points.y0, r_s->height);
+    points.y1 = Utils::clamp(0, points.y1, r_s->height);
     cell cell_p = {};
     cell_p.x0 = points.x0;
     cell_p.x1 = points.x1;
     cell_p.y0 = points.y0;
     cell_p.y1 = points.y1;
+
+    points.y0 = r_s->height - points.y0;
+    points.y1 = r_s->height - points.y1;
+
+
+
+
     cell_p.p_x = p_x;
-    cell_p.p_y = -p_y + 8;
+    cell_p.p_y = p_y;
 
     object_types o = {};
     o.id = cell_id;
     o.object.cell = (struct cell) cell_p;
 
-    for (int y = points.y1; y > points.y0; y--)
+    for (int y = points.y1; y < points.y0; y++)
     {
         object_types* pixel_object = (object_types*)(r_s->data) + points.x0 + y * r_s->width;
 

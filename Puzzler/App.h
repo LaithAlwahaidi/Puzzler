@@ -11,9 +11,10 @@ class SudokuApp
 {
 private:
     Draw& draw;
+    Render_State* rs;
     void drawSudoku(Input* input);
 
 public:
-    SudokuApp(Draw& draw);
+    SudokuApp(Draw& draw, Render_State* rs);
     void simulate(Input* input);
 };

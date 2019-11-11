@@ -31,4 +31,5 @@ struct Input
     Screen_State screen;
     bool mouse_drag = false;
     bool is_higlighted[9][9];
+    int digit[9][9];
 };
