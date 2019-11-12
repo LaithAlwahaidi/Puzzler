@@ -249,17 +249,6 @@ Draw::square Draw::raw_square_pixels(float x, float y, float half_x, float half_
     return raw_square_pixels(x, y, half_x, half_y, r_s->height, r_s->height);
 }
 
-void Draw::draw_rect(float x, float y, float half_x, float half_y, u32 color)
-{
-    draw_rect_pixels(raw_square_pixels(x, y, half_x, half_y), color);
-}
-
-void Draw::draw_rect(float x, float y, int width, int height, int total_width, int total_height, u32 color)
-{
-    square s = raw_square_pixels(x, y, width, height, total_width, total_height);
-    draw_rect_pixels(s, color);
-}
-
 
 void Draw::draw_box(square points, int thickness, u32 color)
 {
@@ -288,18 +277,6 @@ void Draw::draw_box(square points, int thickness, u32 color)
     cur_box.x1 = points.x0 + thickness;
     cur_box.y1 = points.y1;
     draw_rect_pixels(cur_box, color); // left
-}
-
-void Draw::draw_box(float x, float y, float half_x, float half_y, int thickness, u32 color)
-{
-    square points = raw_square_pixels(x, y, half_x, half_y);
-    draw_box(points, thickness, color);
-}
-
-void Draw::draw_box(float x, float y, int width, int height, int total_width, int total_height, int thickness, u32 color)
-{
-    square s = raw_square_pixels(x, y, width, height, total_width, total_height);
-    draw_box(s, thickness, color);
 }
 
 
@@ -345,23 +322,4 @@ void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, 
             pixel_object++;
         }
     }
-}
-
-void Draw::draw_cell(float x, float y, int width, int height, int total_width, int total_height, int thickness, u32 color, int p_x, int p_y, bool highlight)
-{
-
-    square points = raw_square_pixels(x, y, width, height, total_width, total_height);
-    draw_box(points, thickness, color);
-
-    draw_cell(points, thickness, color, p_x, p_y, highlight);
-
-}
-
-void Draw::draw_cell(float x, float y, float half_x, float half_y, int thickness, u32 color, int p_x, int p_y, bool highlight)
-{
-
-    draw_box(x, y, half_x, half_y, thickness, color);
-
-    square points = raw_square_pixels(x, y, half_x, half_y);
-    draw_cell(points, thickness, color, p_x, p_y, highlight);
 }
