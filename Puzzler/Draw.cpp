@@ -2,8 +2,8 @@
 #include <fstream>
 #include <string>
 
-const char* FONT_HEADER = "assets/font1.fnt";
-const wchar_t* FONT_DATA = L"assets/font1_0.png";
+const char* FONT_HEADER = "assets/font2_L.fnt";
+const wchar_t* FONT_DATA = L"assets/font2_L_0.png";
 
 using namespace std;
 
@@ -63,7 +63,7 @@ Draw::Draw(Render_State* rs)
                 u32* cur_pixels;
                 cur_pixels = new u32[width * height];
                 int ind = 0;
-                for (int r = height + y - 1; r >= y; r--)
+                for (int r = y; r < height + y; r++)
                 {
                     for (int c = x; c < width + x; c++)
                     {
@@ -117,37 +117,23 @@ void Draw::draw_digit(char c, int x, int y)
     }
 }
 
-void Draw::draw_digit(char c, float x, float y, int scale_width, int scale_height)
-{
-    x *= scale_width;
-    y *= scale_height;
 
-    x += r_s->width / 2.f;
-    y += r_s->height / 2.f;
-
-    for (auto const& cur_c : my_chars)
-    {
-        if (cur_c.char_id == int(c))
-        {
-            int x0 = x - cur_c.width / 2;
-            int y0 = y - cur_c.height / 2;
-            draw_sprite_pixels(x0, y0, cur_c.width, cur_c.height, cur_c.pixels);
-        }
-    }
-}
 
 
 void Draw::draw_sprite_pixels(int x, int y, int width, int height, u32* source)
 {
-    //x = Utils::clamp(0, x, r_s->width);
-    //y = Utils::clamp(0, y, r_s->height);
+    x = Utils::clamp(0, x, r_s->width);
+    y = Utils::clamp(0, y, r_s->width);
+
+    y = r_s->height - y - 1;
+
     if (r_s->width <= 0 || r_s->height <= 0)
         return;
 
     u32 s_color;
     for (int y_d = 0; y_d < height; y_d++)
     {
-        u32* dest = (u32*)r_s->memory + x + y * r_s->width + y_d * r_s->width;
+        u32* dest = (u32*)r_s->memory + x + (y - 1) * r_s->width - y_d * r_s->width;
 
         for (int x_d = 0; x_d < width; x_d++)
         {
@@ -194,13 +180,16 @@ void Draw::draw_sprite(float x, float y, float half_x, float half_y, int width, 
 
 void Draw::draw_rect_pixels(square points, u32 color)
 {
+    if (r_s->width <= 0 || r_s->height <= 0)
+        return;
+
     points.x0 = Utils::clamp(0, points.x0, r_s->width);
     points.x1 = Utils::clamp(0, points.x1, r_s->width);
     points.y0 = Utils::clamp(0, points.y0, r_s->height);
     points.y1 = Utils::clamp(0, points.y1, r_s->height);
 
-    points.y0 = r_s->height - points.y0;
-    points.y1 = r_s->height - points.y1;
+    points.y0 = r_s->height - points.y0 - 1;
+    points.y1 = r_s->height - points.y1 - 1;
 
     for (int y = points.y1; y < points.y0; y++)
     {
@@ -212,42 +201,7 @@ void Draw::draw_rect_pixels(square points, u32 color)
     }
 }
 
-Draw::square Draw::raw_square_pixels(float x, float y, int width, int height, int scale_width, int scale_height)
-{
-    x *= scale_width;
-    y *= scale_height;
 
-    x += r_s->width / 2.f;
-    y += r_s->height / 2.f;
-
-    int x0 = x - width;
-    int x1 = x + width;
-    int y0 = y - height;
-    int y1 = y + height;
-    return square{ x0, y0, x1, y1 };
-}
-
-Draw::square Draw::raw_square_pixels(float x, float y, float half_x, float half_y, int scale_width, int scale_height)
-{
-    x *= scale_width;
-    y *= scale_height;
-    half_x *= scale_width;
-    half_y *= scale_height;
-
-    x += r_s->width / 2.f;
-    y += r_s->height / 2.f;
-
-    int x0 = x - half_x;
-    int x1 = x + half_x;
-    int y0 = y - half_y;
-    int y1 = y + half_y;
-    return square{ x0, y0, x1, y1 };
-}
-
-Draw::square Draw::raw_square_pixels(float x, float y, float half_x, float half_y)
-{
-    return raw_square_pixels(x, y, half_x, half_y, r_s->height, r_s->height);
-}
 
 
 void Draw::draw_box(square points, int thickness, u32 color)
@@ -282,6 +236,9 @@ void Draw::draw_box(square points, int thickness, u32 color)
 
 void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, bool highlight)
 {
+    if (r_s->width <= 0 || r_s->height <= 0)
+        return;
+
     draw_box(points, thickness, color);
     points.x0 += thickness;
     points.y0 += thickness;
@@ -299,8 +256,8 @@ void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, 
     cell_p.y0 = points.y0;
     cell_p.y1 = points.y1;
 
-    points.y0 = r_s->height - points.y0;
-    points.y1 = r_s->height - points.y1;
+    points.y0 = r_s->height - points.y0 - 1;
+    points.y1 = r_s->height - points.y1 - 1;
 
 
 

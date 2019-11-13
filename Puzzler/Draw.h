@@ -30,10 +30,6 @@ private:
 
     Render_State* r_s;
 
-    square raw_square_pixels(float x, float y, float half_x, float half_y);
-    square raw_square_pixels(float x, float y, float half_x, float half_y, int scale_width, int scale_height);
-    square raw_square_pixels(float x, float y, int width, int height, int scale_width, int scale_height);
-
     std::vector<mychar> my_chars;
 
 

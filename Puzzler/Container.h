@@ -28,4 +28,6 @@ public:
 
     void draw_rect(float x, float y, int width, int height, u32 color);
     void draw_rect(float x, float y, float width, float height, u32 color);
+
+    void draw_char(char c, float x, float y);
 };

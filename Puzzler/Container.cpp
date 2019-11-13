@@ -8,7 +8,7 @@ Container::Container(float x, float y, float width, float height, Render_State* 
 }
 
 Container::Container(float x, float y, int width, int height, Render_State* rs, Draw& d)
-    : x(x* rs->height), y(y* rs->height),
+    : x(x* rs->width), y(y* rs->height),
     width(width), height(height),
     rs(rs), d(d)
 {
@@ -85,8 +85,8 @@ Draw::square Container::get_coords(float x, float y, int width, int height)
     Draw::square points = {
         x * this->width + this->x,
         y * this->height + this->y,
-        x * this->width + width + this->x,
-        y * this->height + height + this->y
+        x * this->width + this->x + width,
+        y * this->height + this->y + height
     };
 
     return points;
@@ -97,4 +97,10 @@ Draw::square Container::get_coords(float x, float y, float width, float height)
     int widthp = width * this->width;
     int heightp = height * this->height;
     return get_coords(x, y, widthp, heightp);
+}
+
+void Container::draw_char(char c, float x, float y)
+{
+    Draw::square points = get_coords(x, y, 0, 0);
+    d.draw_digit(c, points.x0, points.y0);
 }
