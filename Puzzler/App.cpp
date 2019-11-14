@@ -30,7 +30,7 @@ void SudokuApp::drawSudoku(Input* input)
                 return;
             cellbox->DrawCell(0.0f, 0.0f, 1.0f, 1.0f, 1, 0x888888, c, r, input->is_higlighted[r][c]);
             if (input->digit[r][c] > 0)
-                cellbox->draw_char('0' + input->digit[r][c], 0.3f, 0.3f);
+                cellbox->draw_char('0' + input->digit[r][c], 0.4f, 0.3f);
             delete cellbox;
         }
     }

@@ -126,6 +126,8 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="Draw.cpp" />
+    <ClCompile Include="Solver.cpp" />
+    <ClCompile Include="Sudoku.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="win32_platform.cpp" />
   </ItemGroup>
@@ -134,6 +136,8 @@
     <ClInclude Include="Container.h" />
     <ClInclude Include="Draw.h" />
     <ClInclude Include="platform_common.h" />
+    <ClInclude Include="Solver.h" />
+    <ClInclude Include="Sudoku.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="win32_platform.h" />
   </ItemGroup>

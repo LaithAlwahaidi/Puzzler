@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 
+
 const char* FONT_HEADER = "assets/font2_L.fnt";
 const wchar_t* FONT_DATA = L"assets/font2_L_0.png";
 
@@ -15,7 +16,7 @@ Draw::Draw(Render_State* rs)
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
     Gdiplus::Bitmap* b = Gdiplus::Bitmap::FromFile(FONT_DATA);
 
-    int char_count;
+    int char_count = 0;
     ifstream digit_info;
     digit_info.open(FONT_HEADER, ios::in);
     if (digit_info.is_open())
@@ -28,13 +29,13 @@ Draw::Draw(Render_State* rs)
             if (line_n == 0)
             {
                 int i = line.find("size=", 0) + 5;
-                int font_size = stoi(line.substr(i, line.find(" ", i)));
+                font_size = stoi(line.substr(i, line.find(" ", i)));
             }
             if (line_n == 3)
             {
                 char_count = stoi(line.substr(12, (line.length() - 12)));
             }
-            if (line_n > 3 && char_count > 0)
+            if (char_count > 0)
             {
                 char_count--;
                 int i = line.find("id=", 0) + 3;
@@ -116,8 +117,6 @@ void Draw::draw_digit(char c, int x, int y)
         }
     }
 }
-
-
 
 
 void Draw::draw_sprite_pixels(int x, int y, int width, int height, u32* source)
@@ -244,8 +243,10 @@ void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, 
     points.y0 += thickness;
     points.x1 -= thickness;
     points.y1 -= thickness;
+
     if (highlight)
         draw_rect_pixels(points, 0xfffa61);
+
     points.x0 = Utils::clamp(0, points.x0, r_s->width);
     points.x1 = Utils::clamp(0, points.x1, r_s->width);
     points.y0 = Utils::clamp(0, points.y0, r_s->height);
@@ -258,8 +259,6 @@ void Draw::draw_cell(square points, int thickness, u32 color, int p_x, int p_y, 
 
     points.y0 = r_s->height - points.y0 - 1;
     points.y1 = r_s->height - points.y1 - 1;
-
-
 
 
     cell_p.p_x = p_x;
